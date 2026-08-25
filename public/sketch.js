@@ -11,10 +11,12 @@ let capture, pg
 let threshold = .5
 const penW = 1.8
 const penH = 1.8
-const NX = 50 // NB PIXEL X
-const NY = 80 // NB PIXEL Y
+const NX = 50*1 // NB PIXEL X
+const NY = 80*1 // NB PIXEL Y
 const pixelSize = 10
 
+const paperW = 105
+const paperH = 297/2
 const plotW = NX * penW
 const plotH = NY * penH
 
@@ -26,6 +28,7 @@ const manDist = (a, b) => abs(a[0] - b[0]) + abs(a[1] - b[1])
 function setup() {
     createCanvas(NX*pixelSize, NY*pixelSize)
     pixelDensity(1)
+    document.querySelector('canvas').removeAttribute('style')
     pg = createGraphics(width, height)
     capture = createCapture(VIDEO)
     capture.hide()
@@ -64,9 +67,8 @@ function keyPressed() {
     if(!isPlotting) { // export svg
         isPlotting = true
 
-        let w = width/pixelSize*penH
-        let h = height/pixelSize*penH
-        let s = `<svg viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" stroke="yellow" fill="none"/>`
+        let w = width / pixelSize * penW
+        let h = height / pixelSize * penH
         const paths = []
         let i = 0
         for(let y = pixelSize/2; y < pg.height; y += pixelSize) {
@@ -85,13 +87,11 @@ function keyPressed() {
                     if(!d && isLine) {
                         isLine = false
                         x2 = nf2((x - pixelSize/2)/pixelSize * penH - penW/2)
-                        s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y1}" stroke="black"/>`
                         paths.push([[x1, y1], [x2, y1]])
                     }
                 }
                 if(isLine) {
                     x2 = nf2(pg.width/pixelSize * penH - penW/2)
-                    s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y1}" stroke="black"/>`
                     paths.push([[x1, y1], [x2, y1]])
                 }
             }
@@ -106,28 +106,23 @@ function keyPressed() {
                     if(!d && isLine) {
                         isLine = false
                         x2 = nf2((x + pixelSize/2)/pixelSize * penH + penW/2)
-                        s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y1}" stroke="black"/>`
                         paths.push([[x1, y1], [x2, y1]])
                     }
                 }
                 if(isLine) {
                     x2 = nf2(penW/2)
-                    s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y1}" stroke="black"/>`
                     paths.push([[x1, y1], [x2, y1]])
                 }
             } 
 
             i++
         }
-        s += `</svg>`
-        if(key === 's') saveStrings([s], `plotomaton_${Date.now()}`, 'svg')
         console.log({paths})
 
         let points = paths.flat()
         console.log({points})
 
         const sortedPaths = []
-        let currentPos = [0, 0], currentPath
 
         const getNextPt = pt => {
             let index, nextPt
@@ -151,6 +146,7 @@ function keyPressed() {
             return nextPath
         }
 
+        let currentPos = [0, 0], currentPath
         while(paths.length) {
             currentPos = getNextPt(currentPos)
             currentPath = getNextPath(currentPos)
@@ -159,9 +155,31 @@ function keyPressed() {
             points.splice(points.findIndex(p => p[0] === currentPos[0] && p[1] === currentPos[1]), 1)
         }
 
+        const marginX = (paperH - h) / 2
+        const marginY = (paperW - w) / 2
+        sortedPaths.forEach(([a, b]) => {
+            // rotate 90°
+            a[0] = w - a[0]
+            a = a.reverse()
+            b[0] = w - b[0]
+            b = b.reverse()
+            
+            // center on paper
+            a[0] += marginX
+            a[1] += marginY
+            b[0] += marginX
+            b[1] += marginY
+        })
+
         console.log({sortedPaths})
 
-        socket.emit('msg', sortedPaths)
+        if(key === 's') {
+            let s = `<svg viewBox="0 0 ${paperH} ${paperW}">\n<rect width="${paperH}" height="${paperW}" stroke="yellow" fill="none"/>\n${sortedPaths.map(([a, b]) => `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="black"/>`).join('\n')}\n</svg>`
+            saveStrings([s], `plotomaton_${Date.now()}`, 'svg')
+        }
+
+        // socket.emit('msg', sortedPaths)
+        isPlotting = false
     }
 }
 
