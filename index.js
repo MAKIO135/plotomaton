@@ -44,9 +44,9 @@ const arrToGen = arr => {
                 await axi.draw(arrToGen([
                     START,
                     ...msg.map(([a, b]) => [
-                        MOVE(a.reverse(), 1),
+                        MOVE(a, 1),
                         DOWN(),
-                        MOVE(b.reverse(), 2), 
+                        MOVE(b, 2), 
                         UP(),
                     ]).flat(),
                     MOVE([0, 0], 1),
