@@ -186,3 +186,7 @@ function keyPressed() {
 function mouseDragged() {
     threshold = mouseX/width
 }
+
+function doubleClicked() {
+    fullscreen(!fullscreen())
+}
