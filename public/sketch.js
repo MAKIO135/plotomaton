@@ -1,28 +1,29 @@
 const socket = io()
+
 let isPlotting = false
+
 socket.on('completed', () => {
     console.log('completed')
     isPlotting = false
 })
 
-let capture, pg
-let threshold = .5
+const { paperW, paperH } = formats.A6
 const penW = 1.6
 const penH = 1.6
 const NX = 50*1 // NB PIXEL X
 const NY = 80*1 // NB PIXEL Y
 const pixelSize = 10
 
-const paperW = 210/2 // A6
-const paperH = 297/2 // A6
 const plotW = NX * penW
 const plotH = NY * penH
-
 console.log(`plotSize : ${plotW}x${plotH}mm`)
+if(plotW > paperW || plotH > paperH) alert('')
+
 let sortedPaths
+let capture, pg
+let threshold = .5
 
 const nf2 = n => (n * 100|0)/100
-const manDist = (a, b) => abs(a[0] - b[0]) + abs(a[1] - b[1])
 
 function setup() {
     createCanvas(NX*pixelSize, NY*pixelSize)
@@ -125,11 +126,11 @@ function keyPressed() {
 
         const getNextPt = pt => {
             let index, nextPt
-            let minManDist = 10e5
+            let minDist = 10e5
             points.forEach((p, i) => {
-                let d = manDist(p, pt)
-                if(d < minManDist) {
-                    minManDist = d
+                let d = dist(...p, ...pt)
+                if(d < minDist) {
+                    minDist = d
                     index = i
                     nextPt = [...p]
                 }
@@ -180,14 +181,14 @@ function keyPressed() {
         saveStrings([s], `plotomaton_${Date.now()}`, 'svg')
     }
 
-    if(!isPlotting && key === 'p') { // plot again
+    if(!isPlotting && key === 'r') { // re-plot
         isPlotting = true
         socket.emit('msg', sortedPaths)
     }
 }
 
 function mouseDragged() {
-    threshold = mouseX/width
+    threshold = mouseX / width
 }
 
 function doubleClicked() {
