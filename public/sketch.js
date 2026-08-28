@@ -180,7 +180,7 @@ function keyPressed() {
         saveStrings([s], `plotomaton_${Date.now()}`, 'svg')
     }
 
-    if(key === 'p') { // plot again
+    if(!isPlotting && key === 'p') { // plot again
         isPlotting = true
         socket.emit('msg', sortedPaths)
     }
