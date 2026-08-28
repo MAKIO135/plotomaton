@@ -36,14 +36,14 @@ const arrToGen = arr => {
     io.on('connection', socket => {
         console.log('user connected')
 
-        socket.on('msg', async (msg) => {
+        socket.on('plot', async (paths) => {
             if(!isPlotting) {
                 isPlotting = true
-                // console.log('new plot:', msg)
+                // console.log('new plot:', paths)
 
                 await axi.draw(arrToGen([
                     START,
-                    ...msg.map(([a, b]) => [
+                    ...paths.map(([a, b]) => [
                         MOVE(a, 1),
                         DOWN(),
                         MOVE(b, 2),
