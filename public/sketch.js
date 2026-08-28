@@ -19,6 +19,7 @@ const plotW = NX * penW
 const plotH = NY * penH
 
 console.log(`plotSize : ${plotW}x${plotH}mm`)
+let sortedPaths
 
 const nf2 = n => (n * 100|0)/100
 const manDist = (a, b) => abs(a[0] - b[0]) + abs(a[1] - b[1])
@@ -33,7 +34,7 @@ function setup() {
 }
 
 function draw() {
-    if(!isPlotting) {
+    if(!isPlotting && key === ' ') {
         pg.imageMode(CENTER)
 
         pg.push()
@@ -120,7 +121,7 @@ function keyPressed() {
         let points = paths.flat()
         console.log({points})
 
-        const sortedPaths = []
+        sortedPaths = []
 
         const getNextPt = pt => {
             let index, nextPt
@@ -171,11 +172,16 @@ function keyPressed() {
 
         console.log({sortedPaths})
 
-        if(key === 's') {
-            let s = `<svg viewBox="0 0 ${paperH} ${paperW}">\n<rect width="${paperH}" height="${paperW}" stroke="yellow" fill="none"/>\n${sortedPaths.map(([a, b]) => `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="black"/>`).join('\n')}\n</svg>`
-            saveStrings([s], `plotomaton_${Date.now()}`, 'svg')
-        }
+        socket.emit('msg', sortedPaths)
+    }
 
+    if(key === 's') { // export SVG
+        let s = `<svg viewBox="0 0 ${paperH} ${paperW}">\n<rect width="${paperH}" height="${paperW}" stroke="yellow" fill="none"/>\n${sortedPaths.map(([a, b]) => `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="black"/>`).join('\n')}\n</svg>`
+        saveStrings([s], `plotomaton_${Date.now()}`, 'svg')
+    }
+
+    if(key === 'p') { // plot again
+        isPlotting = true
         socket.emit('msg', sortedPaths)
     }
 }
