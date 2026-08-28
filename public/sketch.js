@@ -1,5 +1,3 @@
-console.log('v0.1')
-
 const socket = io()
 let isPlotting = false
 socket.on('completed', () => {
@@ -15,8 +13,8 @@ const NX = 50*1 // NB PIXEL X
 const NY = 80*1 // NB PIXEL Y
 const pixelSize = 10
 
-const paperW = 105
-const paperH = 297/2
+const paperW = 210/2 // A6
+const paperH = 297/2 // A6
 const plotW = NX * penW
 const plotH = NY * penH
 
@@ -178,8 +176,7 @@ function keyPressed() {
             saveStrings([s], `plotomaton_${Date.now()}`, 'svg')
         }
 
-        // socket.emit('msg', sortedPaths)
-        isPlotting = false
+        socket.emit('msg', sortedPaths)
     }
 }
 
