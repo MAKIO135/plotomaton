@@ -46,7 +46,7 @@ const arrToGen = arr => {
                     ...msg.map(([a, b]) => [
                         MOVE(a, 1),
                         DOWN(),
-                        MOVE(b, 2), 
+                        MOVE(b, 2),
                         UP(),
                     ]).flat(),
                     MOVE([0, 0], 1),
