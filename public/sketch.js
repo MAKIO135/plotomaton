@@ -9,8 +9,8 @@ socket.on('completed', () => {
 
 let capture, pg
 let threshold = .5
-const penW = 1.8
-const penH = 1.8
+const penW = 1.6
+const penH = 1.6
 const NX = 50*1 // NB PIXEL X
 const NY = 80*1 // NB PIXEL Y
 const pixelSize = 10
