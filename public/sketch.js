@@ -34,7 +34,7 @@ function setup() {
 }
 
 function draw() {
-    if(!isPlotting && key === ' ') {
+    if(!isPlotting) {
         pg.imageMode(CENTER)
 
         pg.push()
@@ -63,7 +63,7 @@ function draw() {
 }
 
 function keyPressed() {
-    if(!isPlotting) { // export svg
+    if(!isPlotting && key === ' ') { // export svg
         isPlotting = true
 
         let w = width / pixelSize * penW
