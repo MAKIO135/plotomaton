@@ -10,8 +10,8 @@ socket.on('completed', () => {
 const { paperW, paperH } = formats.A6
 const penW = 1.6
 const penH = 1.6
-const NX = 50*1 // NB PIXEL X
-const NY = 80*1 // NB PIXEL Y
+const NX = 50 // NB PIXEL X
+const NY = 80 // NB PIXEL Y
 const pixelSize = 10
 
 const plotW = NX * penW
