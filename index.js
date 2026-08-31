@@ -18,8 +18,8 @@ const arrToGen = arr => {
 
 (async () => {
     const axi = new AxiDraw()
-    await axi.connect("/dev/tty.usbmodem")
-    await axi.penUp()
+    // await axi.connect("/dev/tty.usbmodem")
+    // await axi.penUp()
 
     let isPlotting = false
 

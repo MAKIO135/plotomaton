@@ -1,5 +1,5 @@
-const FORMAT = 'A6'
-const ORIENTATION = 'PORTRAIT' // 'PORTRAIT' or 'LANDSCAPE'
+let FORMAT = 'A6'
+let ORIENTATION = 'PORTRAIT' // 'PORTRAIT' or 'LANDSCAPE'
 const margin = 10 // margin around plot in mm
 
 const socket = io()
@@ -32,13 +32,13 @@ const formats = {
 }
 let { paperW, paperH } = formats[FORMAT]
 if(ORIENTATION === 'LANDSCAPE') [paperW, paperH] = [paperH, paperW]
-const penW = 1.6
-const penH = 1.6
-const NX = (paperW - margin * 2) / penW | 0 // NB PIXEL X
-const NY = (paperH - margin * 2) / penH | 0 // NB PIXEL Y
+let penW = 1.6
+let penH = 1.6
+let NX = (paperW - margin * 2) / penW | 0 // NB PIXEL X
+let NY = (paperH - margin * 2) / penH | 0 // NB PIXEL Y
 const pixelSize = 10
-const plotW = nbFormat(NX * penW)
-const plotH = nbFormat(NY * penH)
+let plotW = nbFormat(NX * penW)
+let plotH = nbFormat(NY * penH)
 console.log({paperW, paperH, penW, penH, plotW, plotH, NX, NY})
 
 let sortedPaths
@@ -46,7 +46,8 @@ let capture, pg
 let threshold = .5
 
 function setup() {
-    createCanvas(NX*pixelSize, NY*pixelSize)
+    let ccanvas = createCanvas(NX*pixelSize, NY*pixelSize)
+    ccanvas.parent("cvsContainer")
     pixelDensity(1)
     document.querySelector('canvas').removeAttribute('style')
     pg = createGraphics(width, height)
@@ -191,35 +192,76 @@ function computePaths() {
     })
 }
 
-function keyPressed() {
-    if(!isPlotting && key === ' ') { // export svg
-        isPlotting = true
-        computePaths()
-        socket.emit('plot', sortedPaths)
-    }
 
-    if(key === 's') { // export SVG
-        computePaths()
-        let w = ORIENTATION === 'PORTRAIT' ? paperH : paperW
-        let h = ORIENTATION === 'PORTRAIT' ? paperW : paperH
-        let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}">\n<rect width="${w}" height="${h}" stroke="yellow" fill="none"/>\n${sortedPaths.map(([a, b]) => `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="black" stroke-width="${penH}" stroke-linecap="project"/>`).join('\n')}\n</svg>`
-        saveStrings([s], `plotomaton_${Date.now()}`, 'svg')
-    }
-
-    if(!isPlotting && key === 'r') { // re-plot
-        isPlotting = true
-        socket.emit('plot', sortedPaths)
-    }
+/* -- */
+const setRangeValue = (targetID, value) => {
+    document.querySelector(`#${targetID}`).innerHTML = value;
 }
 
-function mouseDragged() {
-    threshold = nbFormat(mouseX / width)
-}
+const rangeThreshold = document.querySelector("#threshold")
+setRangeValue("thresholdValue", threshold);
+rangeThreshold.addEventListener("change", (e)=>{
+    threshold = rangeThreshold.value
+    setRangeValue("thresholdValue", threshold)
+    console.log(`new threshold value: ${threshold}`)
+});
 
-function mouseReleased() {
-    console.log({threshold})
-}
+// print format
+const printFormat = document.querySelector("#formats");
+printFormat.addEventListener("change", (e)=>{
+    FORMAT = printFormat.value;
+});
 
-function doubleClicked() {
-    fullscreen(!fullscreen())
-}
+// print orientation
+const printOrientation = document.querySelectorAll('input[name="orientation"]');
+printOrientation.forEach((r,i)=>{
+    r.addEventListener("click", (e)=>{
+        ORIENTATION = r.value;
+    });
+})
+
+// pen X
+const rangePenX = document.querySelector("#penSizeX");
+setRangeValue("penSizeXValue", penW);
+rangePenX.addEventListener("change", (e)=>{
+    setRangeValue("penSizeXValue", rangePenX.value);
+    penW = rangePenX.value;
+
+});
+
+// pen Y
+const rangePenY = document.querySelector("#penSizeY");
+setRangeValue("penSizeYValue", penH);
+rangePenY.addEventListener("change", (e)=>{
+    setRangeValue("penSizeYValue", rangePenY.value);
+    penH = rangePenY.value;
+});
+
+const SendToPrinter = document.querySelector("#SendToPrinter")
+SendToPrinter.addEventListener("click", (e)=>{
+    if(isPlotting){return}
+    isPlotting = true
+    computePaths()
+    socket.emit('plot', sortedPaths)
+});
+
+const ResendToPrinter = document.querySelector("#ResendToPrinter")
+ResendToPrinter.addEventListener("click", (e)=>{
+    if(isPlotting){return}
+    isPlotting = true
+    socket.emit('plot', sortedPaths)
+});
+
+const SaveToSvg = document.querySelector("#SaveToSvg")
+SaveToSvg.addEventListener("click", (e)=>{
+    computePaths()
+    let w = ORIENTATION === 'PORTRAIT' ? paperH : paperW
+    let h = ORIENTATION === 'PORTRAIT' ? paperW : paperH
+    let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}">\n<rect width="${w}" height="${h}" stroke="yellow" fill="none"/>\n${sortedPaths.map(([a, b]) => `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="black" stroke-width="${penH}" stroke-linecap="project"/>`).join('\n')}\n</svg>`
+    saveStrings([s], `plotomaton_${Date.now()}`, 'svg')
+})
+
+// function doubleClicked() {
+//     fullscreen(!fullscreen())
+// }
+
