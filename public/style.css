@@ -33,7 +33,7 @@ body {
 }
 
 #cvsContainer,
-svg {
+canvas {
   /* width: 60vw; */
   height: 98vh;
   object-fit: contain;

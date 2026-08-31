@@ -14,7 +14,7 @@
         <h1>Plotomaton</h1>
 
         <div id="inputContainer" class="rangeContainer small-padding-top">
-            <label for="threshold" class="centered">change threshold</label>
+            <label for="threshold" class="centered">Set threshold</label>
             <input 
                 type="range" 
                 id="threshold" 
@@ -22,13 +22,13 @@
                 min="0.1" 
                 max="1"
                 value="0.5"
-                step=".05"
+                step=".02"
             />
             <p id="thresholdValue" class="light-dark centered">0</p>
         </div>
 
         <div class="small-padding">
-            <label for="format" class="centered">Print format</label>
+            <label for="format" class="centered">Paper format</label>
             <select id="formats" name="formats">
                 <option value="A6">A6</option>
                 <option value="A5">A5</option>
@@ -39,15 +39,15 @@
        
 
         <div id="orientation" class="small-padding">
-            <p>Print orientation</p>
+            <p>Orientation</p>
             <input type="radio" id="PORTRAIT" name="orientation" value="PORTRAIT" checked>
             <label for="PORTRAIT">Portrait</label><br>
             <input type="radio" id="LANDSCAPE" name="orientation" value="LANDSCAPE">
             <label for="LANDSCAPE">Landscape</label><br>
         </div>
         
-        <div id="penSizeXContainer" class="rangeContainer small-padding-top">
-            <label for="penSizeX" class="centered">change pen size x</label>
+        <!-- <div id="penSizeXContainer" class="rangeContainer small-padding-top">
+            <label for="penSizeX" class="centered">Set pen width</label>
             <input 
                 type="range" 
                 id="penSizeX" 
@@ -61,7 +61,7 @@
         </div>
 
         <div id="penSizeYContainer" class="rangeContainer small-padding-top">
-            <label for="penSizeY" class="centered">change pen size y</label>
+            <label for="penSizeY" class="centered">Set pen height</label>
             <input 
                 type="range" 
                 id="penSizeY" 
@@ -72,11 +72,12 @@
                 step="0.1"
             />
             <p id="penSizeYValue" class="light-dark centered">0</p>
-        </div>
+        </div> -->
 
-        <button id="SendToPrinter">print</button>
-        <button id="ResendToPrinter">print last job</button>
-        <button id="SaveToSvg">export to svg</button>
+        <button id="SendToPrinter">Print</button>
+        <button id="ResendToPrinter">Print last job</button>
+        <button id="SaveToSvg">Export SVG</button>
+        <button id="ToggleFullscreen">Toggle fullscreen</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/p5.js"></script>
