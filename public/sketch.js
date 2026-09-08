@@ -88,52 +88,28 @@ function computePaths() {
     let w = width / pixelSize * penW
     let h = height / pixelSize * penH
     const paths = []
-    let i = 0
     for(let y = pixelSize/2; y < pg.height; y += pixelSize) {
         let y1 = nbFormat((y - pixelSize/2)/pixelSize * penH + penH/2)
         let isLine = false
         let x1, x2
 
-        if(i % 2 === 0) {
-            for(let x = pixelSize/2; x < pg.width; x += pixelSize) {
-                let index = (y * pg.width + x) * 4
-                let d = 255 - pg.pixels[index] // black pixels are lines
-                if(d && !isLine) {
-                    isLine = true
-                    x1 = nbFormat((x - pixelSize/2)/pixelSize * penH + penW/2)
-                }
-                if(!d && isLine) {
-                    isLine = false
-                    x2 = nbFormat((x - pixelSize/2)/pixelSize * penH - penW/2)
-                    paths.push([[x1, y1], [x2, y1]])
-                }
+        for(let x = pixelSize/2; x < pg.width; x += pixelSize) {
+            let index = (y * pg.width + x) * 4
+            let d = 255 - pg.pixels[index] // black pixels are lines
+            if(d && !isLine) {
+                isLine = true
+                x1 = nbFormat((x - pixelSize/2)/pixelSize * penH + penW/2)
             }
-            if(isLine) {
-                x2 = nbFormat(pg.width/pixelSize * penH - penW/2)
+            if(!d && isLine) {
+                isLine = false
+                x2 = nbFormat((x - pixelSize/2)/pixelSize * penH - penW/2)
                 paths.push([[x1, y1], [x2, y1]])
             }
         }
-        else {
-            for(let x = pg.width - pixelSize/2; x > 0; x -= pixelSize) {
-                let index = (y * pg.width + x) * 4
-                let d = 255 - pg.pixels[index] // black pixels are lines
-                if(d && !isLine) {
-                    isLine = true
-                    x1 = nbFormat((x + pixelSize/2)/pixelSize * penH - penW/2)
-                }
-                if(!d && isLine) {
-                    isLine = false
-                    x2 = nbFormat((x + pixelSize/2)/pixelSize * penH + penW/2)
-                    paths.push([[x1, y1], [x2, y1]])
-                }
-            }
-            if(isLine) {
-                x2 = nbFormat(penW/2)
-                paths.push([[x1, y1], [x2, y1]])
-            }
-        } 
-
-        i++
+        if(isLine) {
+            x2 = nbFormat(pg.width/pixelSize * penH - penW/2)
+            paths.push([[x1, y1], [x2, y1]])
+        }
     }
     console.log({paths})
 
@@ -168,8 +144,10 @@ function computePaths() {
     while(paths.length) {
         currentPos = getNextPt(currentPos)
         currentPath = getNextPath(currentPos)
-        sortedPaths.push(currentPath)
-        currentPos = currentPath[1 - currentPath.findIndex(p => p[0] === currentPos[0] && p[1] === currentPos[1])]
+        let ptIndex = currentPath.findIndex(p => p[0] === currentPos[0] && p[1] === currentPos[1])
+        console.log({ptIndex})
+        sortedPaths.push(ptIndex === 0 ? currentPath : currentPath.toReversed())
+        currentPos = currentPath[1 - ptIndex]
         points.splice(points.findIndex(p => p[0] === currentPos[0] && p[1] === currentPos[1]), 1)
     }
 
