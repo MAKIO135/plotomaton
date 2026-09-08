@@ -145,7 +145,6 @@ function computePaths() {
         currentPos = getNextPt(currentPos)
         currentPath = getNextPath(currentPos)
         let ptIndex = currentPath.findIndex(p => p[0] === currentPos[0] && p[1] === currentPos[1])
-        console.log({ptIndex})
         sortedPaths.push(ptIndex === 0 ? currentPath : currentPath.toReversed())
         currentPos = currentPath[1 - ptIndex]
         points.splice(points.findIndex(p => p[0] === currentPos[0] && p[1] === currentPos[1]), 1)
